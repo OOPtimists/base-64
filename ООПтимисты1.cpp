@@ -2,7 +2,6 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include <locale>
 
 using namespace std;
 
@@ -10,41 +9,41 @@ const string base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 "abcdefghijklmnopqrstuvwxyz"
 "0123456789+/";
 
-// Ïğîâåğêà ñèìâîëà Base64
+// Ñ„ÑƒĞ½ĞºÑ†Ğ¸Ñ Ğ¿Ñ€Ğ¾Ğ²ĞµÑ€ÑĞµÑ‚, ÑĞ²Ğ»ÑĞµÑ‚ÑÑ Ğ»Ğ¸ ÑĞ¸Ğ¼Ğ²Ğ¾Ğ» Ğ´Ğ¾Ğ¿ÑƒÑÑ‚Ğ¸Ğ¼Ñ‹Ğ¼ Ğ´Ğ»Ñ ĞºĞ¾Ğ´Ğ¸Ñ€Ğ¾Ğ²ĞºĞ¸ Base64
 bool is_base64(unsigned char c) {
     return (isalnum(c) || (c == '+') || (c == '/'));
 }
 
-// Êîäèğîâàíèå â Base64
+// Ñ„ÑƒĞ½ĞºÑ†Ğ¸Ñ ĞºĞ¾Ğ´Ğ¸Ñ€Ğ¾Ğ²Ğ°Ğ½Ğ¸Ñ Ğ² Base64
 string base64_encode(const string& input) {
     string encoded;
-    unsigned char char_array_3[3];
-    unsigned char char_array_4[4];
+    unsigned char bytes_3[3];
+    unsigned char bytes_4[4];
     int i = 0, j = 0;
 
     for (unsigned char c : input) {
-        char_array_3[i++] = c;
+        bytes_3[i++] = c;
         if (i == 3) {
-            char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
-            char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
-            char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
-            char_array_4[3] = char_array_3[2] & 0x3f;
+            bytes_4[0] = (bytes_3[0] & 0xfc) >> 2;
+            bytes_4[1] = ((bytes_3[0] & 0x03) << 4) + ((bytes_3[1] & 0xf0) >> 4);
+            bytes_4[2] = ((bytes_3[1] & 0x0f) << 2) + ((bytes_3[2] & 0xc0) >> 6);
+            bytes_4[3] = bytes_3[2] & 0x3f;
 
             for (i = 0; i < 4; i++)
-                encoded += base64_chars[char_array_4[i]];
+                encoded += base64_chars[bytes_4[i]];
             i = 0;
         }
     }
 
     if (i) {
-        for (j = i; j < 3; j++) char_array_3[j] = '\0';
+        for (j = i; j < 3; j++) bytes_3[j] = '\0';
 
-        char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
-        char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
-        char_array_4[2] = ((char_array_3[1] & 0x0f) << 2);
+        bytes_4[0] = (bytes_3[0] & 0xfc) >> 2;
+        bytes_4[1] = ((bytes_3[0] & 0x03) << 4) + ((bytes_3[1] & 0xf0) >> 4);
+        bytes_4[2] = ((bytes_3[1] & 0x0f) << 2);
 
         for (j = 0; j < i + 1; j++)
-            encoded += base64_chars[char_array_4[j]];
+            encoded += base64_chars[bytes_4[j]];
 
         while (i++ < 3)
             encoded += '=';
@@ -53,25 +52,25 @@ string base64_encode(const string& input) {
     return encoded;
 }
 
-// Äåêîäèğîâàíèå èç Base64
+// Ñ„ÑƒĞ½ĞºÑ†Ğ¸Ñ Ğ´ĞµĞºĞ¾Ğ´Ğ¸Ñ€Ğ¾Ğ²Ğ°Ğ½Ğ¸Ñ Ğ¸Ğ· Base64
 string base64_decode(const string& input) {
     int in_len = input.size();
     int i = 0, j = 0, in_ = 0;
-    unsigned char char_array_4[4], char_array_3[3];
+    unsigned char bytes_4[4], bytes_3[3];
     string decoded;
 
     for (unsigned char c : input) {
         if (c == '=') break;
         if (!is_base64(c)) continue;
 
-        char_array_4[i++] = base64_chars.find(c);
+        bytes_4[i++] = base64_chars.find(c);
         if (i == 4) {
-            char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
-            char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
-            char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
+            bytes_3[0] = (bytes_4[0] << 2) + ((bytes_4[1] & 0x30) >> 4);
+            bytes_3[1] = ((bytes_4[1] & 0xf) << 4) + ((bytes_4[2] & 0x3c) >> 2);
+            bytes_3[2] = ((bytes_4[2] & 0x3) << 6) + bytes_4[3];
 
             for (i = 0; i < 3; i++)
-                decoded += char_array_3[i];
+                decoded += bytes_3[i];
             i = 0;
         }
     }
@@ -79,7 +78,7 @@ string base64_decode(const string& input) {
     return decoded;
 }
 
-// Îáğàáîòêà ôàéëà
+// Ñ„ÑƒĞ½ĞºÑ†Ğ¸Ñ Ğ¾Ğ±Ñ€Ğ°Ğ±Ğ¾Ñ‚ĞºĞ¸ Ñ„Ğ°Ğ¹Ğ»Ğ°
 void processFile(const string& input_file, const string& output_file, bool encode) {
     ifstream in(input_file);
     ofstream out(output_file);
@@ -101,30 +100,26 @@ void processFile(const string& input_file, const string& output_file, bool encod
 }
 
 int main() {
-    setlocale(LC_ALL, "Rus");
-    // Ôàéëû äëÿ êîäèğîâàíèÿ
+    system("chcp 1251");
+    // Ñ„Ğ°Ğ¹Ğ»Ñ‹ Ğ´Ğ»Ñ ĞºĞ¾Ğ´Ğ¸Ñ€Ğ¾Ğ²Ğ°Ğ½Ğ¸Ñ
     string input_files_encode[] = { "input1.txt", "input2.txt", "input3.txt" };
     string output_files_encode[] = { "output1_encoded.txt", "output2_encoded.txt", "output3_encoded.txt" };
 
-    // Ôàéëû äëÿ äåêîäèğîâàíèÿ
+    // Ñ„Ğ°Ğ¹Ğ»Ñ‹ Ğ´Ğ»Ñ Ğ´ĞµĞºĞ¾Ğ´Ğ¸Ñ€Ğ¾Ğ²Ğ°Ğ½Ğ¸Ñ
     string input_files_decode[] = { "encoded1.txt", "encoded2.txt", "encoded3.txt" };
     string output_files_decode[] = { "output1_decoded.txt", "output2_decoded.txt", "output3_decoded.txt" };
 
-    cout << "Íà÷èíàåì àâòîìàòè÷åñêóş îáğàáîòêó ôàéëîâ...\n";
-
-    // Êîäèğîâàíèå ôàéëîâ
+    // ĞºĞ¾Ğ´Ğ¸Ñ€Ğ¾Ğ²Ğ°Ğ½Ğ¸Ğµ Ñ„Ğ°Ğ¹Ğ»Ğ¾Ğ²
     for (int i = 0; i < 3; i++) {
         processFile(input_files_encode[i], output_files_encode[i], true);
-        cout << "Ôàéë " << input_files_encode[i] << " çàêîäèğîâàí â " << output_files_encode[i] << endl;
+        cout << "Ğ¤Ğ°Ğ¹Ğ» " << input_files_encode[i] << " Ğ·Ğ°ĞºĞ¾Ğ´Ğ¸Ñ€Ğ¾Ğ²Ğ°Ğ½ Ğ² " << output_files_encode[i] << endl;
     }
 
-    // Äåêîäèğîâàíèå ôàéëîâ
+    // Ğ´ĞµĞºĞ¾Ğ´Ğ¸Ñ€Ğ¾Ğ²Ğ°Ğ½Ğ¸Ğµ Ñ„Ğ°Ğ¹Ğ»Ğ¾Ğ²
     for (int i = 0; i < 3; i++) {
         processFile(input_files_decode[i], output_files_decode[i], false);
-        cout << "Ôàéë " << input_files_decode[i] << " äåêîäèğîâàí â " << output_files_decode[i] << endl;
+        cout << "Ğ¤Ğ°Ğ¹Ğ» " << input_files_decode[i] << " Ğ´ĞµĞºĞ¾Ğ´Ğ¸Ñ€Ğ¾Ğ²Ğ°Ğ½ Ğ² " << output_files_decode[i] << endl;
     }
-
-    cout << "Îáğàáîòêà çàâåğøåíà." << endl;
 
     return 0;
 }
