@@ -59,15 +59,12 @@ string base64_decode(const string& input) {
     unsigned char bytes_4[4], bytes_3[3];
     string decoded;
 
-    for (unsigned char c : input) {
-        if (c == '=') break;
-        if (!is_base64(c)) continue;
-
-        bytes_4[i++] = base64_chars.find(c);
+    while (in_len-- && (input[in_] != '=') && is_base64(input[in_])) {
+        bytes_4[i++] = base64_chars.find(input[in_++]);
         if (i == 4) {
             bytes_3[0] = (bytes_4[0] << 2) + ((bytes_4[1] & 0x30) >> 4);
             bytes_3[1] = ((bytes_4[1] & 0xf) << 4) + ((bytes_4[2] & 0x3c) >> 2);
-            bytes_3[2] = ((bytes_4[2] & 0x3) << 6) + bytes_4[3];
+            bytes_3[2] = ((bytes_4[2] & 0x03) << 6) + bytes_4[3];
 
             for (i = 0; i < 3; i++)
                 decoded += bytes_3[i];
