@@ -75,8 +75,18 @@ string base64_decode(const string& input) {
         }
     }
 
+    if (i) {
+        for (j = i; j < 4; j++) bytes_4[j] = 0;
+        bytes_3[0] = (bytes_4[0] << 2) + ((bytes_4[1] & 0x30) >> 4);
+        bytes_3[1] = ((bytes_4[1] & 0xf) << 4) + ((bytes_4[2] & 0x3c) >> 2);
+
+        for (j = 0; j < (i - 1); j++)
+            decoded += bytes_3[j];
+    }
+
     return decoded;
 }
+
 
 // функция обработки файла
 void processFile(const string& input_file, const string& output_file, bool encode) {
